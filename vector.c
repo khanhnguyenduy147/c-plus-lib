@@ -118,18 +118,3 @@ void move_data(int *source, int *destination, int size) {
         destination[i] = source[i];
     }
 }
-
-int main() {
-    Vector v;
-    init_vector(&v, 6);
-    push_back(&v, 10);
-    push_back(&v, 20);
-    push_back(&v, 30);
-    push_back(&v, 40);
-
-    printf("Size: %zu", max_size());
-    
-    free_vector(&v);
-
-    return 0;
-}
