@@ -132,6 +132,112 @@ void push_back(List *list, void* val, size_t data_size) {
     list->size++;
 }
 
+void sort(List *list) {
+    if (list->head == NULL || list->head->next == NULL) return;
+
+    for (Node *i = list->head; i != NULL; i = i->next) {
+        for (Node *j = i->next; j != NULL; j = j->next) {
+            if (*(int *)i->data > *(int *)j->data) {
+                int temp = *(int *)i->data;
+                *(int *)i->data = *(int *)j->data;
+                *(int *)j->data = temp;
+            }
+        }
+    }
+}
+
+void reverse(List *list) {
+    if (list->head == NULL || list->head->next == NULL) return;
+
+    Node *prev = NULL, *current = list->head, *next = NULL;
+    while (current != NULL) {
+        next = current->next; // Lưu con trỏ tiếp theo
+        current->next = prev; // Đảo ngược con trỏ
+        prev = current;       // Dịch con trỏ `prev` lên một bước
+        current = next;       // Dịch con trỏ `current` lên một bước
+    }
+    list->head = prev;
+}
+
+void insert(List *list, void *val, size_t data_size, size_t pos) {
+    if (pos > list->size) {
+        printf("Position out of range\n");
+        return;
+    }
+
+    Node *new_node = (Node *)malloc(sizeof(Node));
+    if (new_node == NULL) {
+        perror("Cannot allocate memory\n");
+        exit(EXIT_FAILURE);
+    }
+    new_node->data = malloc(data_size);
+    if (new_node->data == NULL) {
+        perror("Cannot allocate memory\n");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(new_node->data, val, data_size);
+
+    if (pos == 0) { // Insert at the beginning
+        new_node->next = list->head;
+        list->head = new_node;
+    } else {
+        Node * current = list->head;
+        for (size_t i = 0; i < pos - 1; ++i) {
+            current = current->next;
+        }
+        new_node->next = current->next;
+        current->next = new_node;
+    }
+    list->size++;
+}
+
+size_t size_list(List *list) {
+    return list->size;
+}
+
+int is_empty(List *list) {
+    return list->size == 0;
+}
+
+void erase(List *list, size_t index) {
+    if (list == NULL || index >= list->size || list->head == NULL) {
+        printf("Invalid index or empty list.\n");
+        return;
+    }
+
+    Node *current = list->head;
+    Node *prev = NULL;
+
+    if (index == 0) {
+        list->head = current->next;
+        free(current->data);
+        free(current);
+    } else {
+        for (size_t i = 0; i < index; ++i) {
+            prev = current;
+            current = current->next;
+        }
+        prev->next = current->next;
+        free(current->data);
+        free(current);
+    }
+    list->size--;
+}
+
+void clear(List *list) {
+    if (list == NULL) return;
+
+    Node *current = list->head;
+    while (current != NULL) {
+        Node *temp = current;
+        current = current->next;
+        free(temp->data);
+        free(temp);
+    }
+    list->head = NULL;
+    list->size = 0;
+}
+
 void free_list(List *list) {
     if (list == NULL) return;
 
@@ -182,6 +288,9 @@ int main() {
     back_val = back(list);
     printf("Front: %d\n", *front_val);
     printf("Back: %d\n", *back_val);
+
+    // Test size
+    printf("Size: %u\n", size_list(list));
 
     free_list(list);
     return 0;
